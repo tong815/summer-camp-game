@@ -1,61 +1,78 @@
 /**
- * 【资源系统】负责同学：资源组
- * 管理金币、水量、收获数量
+ * Resource system — Resource Team.
+ * Manages food, wood, stone, knowledge, and gold.
  */
 
 window.CampGame = window.CampGame || {};
 
 CampGame.resources = {
-  gold: 0,
-  water: 0,
-  harvestCount: 0,
+  state: {},
 
-  /** 用配置初始化资源 */
   init: function () {
-    var cfg = CampGame.config;
-    this.gold = cfg.initialGold;
-    this.water = cfg.initialWater;
-    this.harvestCount = cfg.initialHarvestCount;
+    var initial = CampGame.config.initialResources;
+    var keys = CampGame.config.resourceKeys;
+    var i;
+
+    this.state = {};
+
+    for (i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      this.state[key] = initial[key] || 0;
+    }
   },
 
-  /** 重置为初始值 */
   reset: function () {
     this.init();
   },
 
-  /** 检查是否有足够资源 */
-  canAfford: function (cost) {
-    if (cost.water && this.water < cost.water) return false;
-    if (cost.gold && this.gold < cost.gold) return false;
-    return true;
+  get: function (key) {
+    return this.state[key] || 0;
   },
 
-  /** 扣除资源，返回是否成功 */
-  spend: function (cost) {
-    if (!this.canAfford(cost)) return false;
-    if (cost.water) this.water -= cost.water;
-    if (cost.gold) this.gold -= cost.gold;
-    return true;
-  },
-
-  /** 增加资源 */
-  add: function (reward) {
-    if (reward.gold) this.gold += reward.gold;
-    if (reward.water) this.water += reward.water;
-    if (reward.harvestCount) this.harvestCount += reward.harvestCount;
-  },
-
-  /** 记录一次收获 */
-  recordHarvest: function () {
-    this.harvestCount += 1;
-  },
-
-  /** 获取当前资源快照 */
   getState: function () {
-    return {
-      gold: this.gold,
-      water: this.water,
-      harvestCount: this.harvestCount,
-    };
+    return this.state;
+  },
+
+  canAfford: function (cost) {
+    var key;
+
+    for (key in cost) {
+      if (cost.hasOwnProperty(key)) {
+        if (this.get(key) < cost[key]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  },
+
+  spend: function (cost) {
+    var key;
+
+    if (!this.canAfford(cost)) {
+      return false;
+    }
+
+    for (key in cost) {
+      if (cost.hasOwnProperty(key)) {
+        this.state[key] -= cost[key];
+      }
+    }
+
+    return true;
+  },
+
+  add: function (reward) {
+    var key;
+
+    for (key in reward) {
+      if (reward.hasOwnProperty(key)) {
+        if (this.state[key] === undefined) {
+          this.state[key] = 0;
+        }
+        this.state[key] += reward[key];
+      }
+    }
   },
 };

@@ -1,80 +1,121 @@
-# 游戏设计思想：可交互矩阵 + 状态变化规则
+# Game Design Idea: Interactive Matrix + State Transition Rules
 
-## 一句话总结
+## One sentence
 
-> **游戏 = 一个格子矩阵 + 每个格子的状态 + 点击后状态如何变化**
+> **Game = a grid of tiles + each tile's state + rules that change states and resources**
 
-这不是复杂的 3D 游戏，而是一种非常适合学习和用 AI 协作的模型。
+---
 
-## 什么是「矩阵」？
+## AI Civilization Village
 
-把游戏地图想象成一个 **表格**（比如 5 行 × 5 列）：
+In this project, you are not just playing a farm game.
 
-```
-⬜ ⬜ ⬜ ⬜ ⬜
-⬜ 🌱 ⬜ ⬜ ⬜
-⬜ ⬜ 🌿 ⬜ ⬜
-⬜ ⬜ ⬜ 🌻 ⬜
-⬜ ⬜ ⬜ ⬜ ⬜
-```
+You are building a **small civilization** that grows toward the **AI Age**.
 
-每个格子有一个 **状态**，例如：
+- The **map** is a matrix (5 rows × 5 columns)
+- Each **tile** stores a state: empty, farm, school, lab, …
+- Each **turn**, rules run: buildings produce resources
+- Your **goal** is to reach enough Knowledge to win
 
-| 状态 | 含义 |
-|------|------|
-| 空地 | 可以种植 |
-| 种子 | 需要浇水 |
-| 幼苗 | 还需要再浇水 |
-| 成熟植物 | 可以收获 |
+This is the same core model as many strategy and simulation games — kept simple for learning.
 
-在代码里，这就是一个二维数组，每个位置存一个字符串或数字。
+---
 
-## 什么是「状态变化规则」？
+## What is the matrix?
 
-当玩家 **点击** 某个格子时，程序会：
-
-1. 读取这个格子 **当前的状态**
-2. 根据 **规则** 决定下一步做什么
-3. 把格子 **改成新状态**，并更新金币、水量等资源
-
-例如：
+Think of the map as a table:
 
 ```
-空地 + 点击 + 有足够的水  →  变成「种子」，水 -1
-种子 + 点击 + 有足够的水  →  变成「幼苗」，水 -1
-幼苗 + 点击 + 有足够的水  →  变成「成熟」，水 -1
-成熟 + 点击                →  变成「空地」，金币 +3，收获 +1
+⬜ ⬜ 🌾 ⬜ ⬜
+⬜ 🏫 ⬜ ⬜ 🌲
+⬜ ⬜ ⬜ ⛏️ ⬜
+⬜ 🏠 ⬜ ⬜ ⬜
+⬜ ⬜ 🧪 ⬜ ⬜
 ```
 
-这些规则写在 `systems/growth.js` 和 `systems/player.js` 里。
+Each cell has one **state** (a building id like `"farm"` or `"empty"`).
 
-## 为什么这种设计适合 AI 夏令营？
+In code, this is a 2D array stored in `systems/grid.js`.
 
-1. **看得见** — 矩阵在页面上直接显示，改完刷新就能看效果
-2. **拆得开** — 地图、资源、成长、任务、界面可以分给不同同学
-3. **说得清** — 需求可以用自然语言描述：「我希望浇水两次才成熟」
-4. **改得小** — 改一个规则通常只动一两个文件，不容易整盘搞乱
+---
 
-## 可以怎么扩展？
+## What are state transition rules?
 
-只要还是「矩阵 + 状态 + 规则」，就可以无限扩展：
+Rules answer: **"When X happens, what changes?"**
 
-- 新格子类型：石头、害虫、宝箱
-- 新资源：肥料、能量
-- 新规则：相邻格子互相影响、随时间自动生长
-- 大地图：10×10、不同地形
+Examples in this game:
 
-扩展时，先 **用中文写清楚规则**，再让 AI 帮你改对应的那个 `.js` 文件。
+| Event                    | Rule                                      |
+|--------------------------|-------------------------------------------|
+| Click empty tile + build | Spend resources → tile becomes a building |
+| Click Next Turn          | Each building adds resources (produces)     |
+| Knowledge reaches 10     | Quest complete → you win                  |
 
-## 和「写代码」的关系
+Building-specific rules live in **`data/buildings.js`**:
 
-你不需要先学会所有语法才能做这个游戏。
+```javascript
+produces: {
+  food: 2,
+}
+```
 
-你需要学会的是：
+`systems/production.js` reads these fields — it does **not** hard-code "farm gives food."
 
-1. 说清楚 **现在是什么**
-2. 说清楚 **想要变成什么**
-3. 知道 **哪个文件管哪件事**
-4. 改完后 **自己点一点、测一测**
+---
 
-AI 负责写代码，你负责 **想规则、提需求、验结果** —— 这就是人机协作。
+## Why data-driven design?
+
+Students should be able to:
+
+- Add a **new building** by editing `data/buildings.js`
+- Change **costs and production** without touching complex logic
+- Describe changes in plain language to AI
+
+Example student request:
+
+> "Add a Library that costs 2 wood and 1 gold and produces 1 knowledge."
+
+That is mostly a **configuration change**, not a rewrite of the whole game.
+
+---
+
+## Turn-based loop
+
+```
+Select building → Click tile → Build (if affordable)
+        ↓
+   Next Turn
+        ↓
+Each tile's building produces resources
+        ↓
+Quest checks progress → UI updates
+```
+
+This loop is easy to test, easy to explain, and easy to extend.
+
+---
+
+## Ideas for extensions
+
+Still using matrix + rules, you could add:
+
+- New resources (energy, population)
+- Buildings that need neighbors to work
+- Random events ("storm removes 1 wood")
+- Bigger map (6×6, 8×8)
+- Multiple win conditions
+
+Always write the rule in **plain language first**, then ask AI to update the right file.
+
+---
+
+## Your role vs AI's role
+
+| You (student)              | AI (assistant)                |
+|----------------------------|-------------------------------|
+| Design the rule            | Write the code                |
+| Say what should happen     | Find the right file to edit   |
+| Test in the browser        | Fix errors you report         |
+| Decide if it feels fun     | Keep code readable            |
+
+You are the **designer and tester**. AI is the **coding helper**.

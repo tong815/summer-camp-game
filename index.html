@@ -1,64 +1,76 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 夏令营 · 迷你农场</title>
+  <title>AI Civilization Village</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="game-wrapper">
     <header class="game-header">
-      <h1>🌾 AI 夏令营 · 迷你农场</h1>
-      <p class="subtitle">可交互矩阵 + 状态变化规则</p>
+      <h1>🏛️ AI Civilization Village</h1>
+      <p class="subtitle">
+        Build a small village, produce resources, and develop knowledge to reach the AI age.
+      </p>
+      <p class="tagline">Interactive Matrix + State Transition Rules</p>
     </header>
 
-    <!-- 资源栏 -->
+    <!-- Resource bar -->
     <section class="panel resources-panel">
-      <h2>资源栏</h2>
-      <div class="stats">
-        <div class="stat-item">💰 金币：<span id="gold-count">0</span></div>
-        <div class="stat-item">💧 水量：<span id="water-count">0</span></div>
-        <div class="stat-item">🧺 收获：<span id="harvest-count">0</span></div>
+      <h2>Resources</h2>
+      <div id="resource-bar" class="stats"></div>
+    </section>
+
+    <!-- Build menu -->
+    <section class="panel build-panel">
+      <h2>Build Menu</h2>
+      <div id="build-menu" class="build-menu"></div>
+      <div id="selected-building" class="selected-building">
+        No building selected.
       </div>
     </section>
 
-    <!-- 任务栏 -->
+    <!-- Task progress -->
     <section class="panel quest-panel">
-      <h2>任务栏</h2>
-      <p id="quest-text">任务：收获 3 个植物</p>
-      <div id="win-banner" class="win-banner hidden">🎉 任务完成！你是优秀的小农夫！</div>
+      <h2>Goal</h2>
+      <p id="quest-text">Reach 10 Knowledge to enter the AI Age.</p>
+      <div id="win-banner" class="win-banner hidden">
+        🎉 You reached the AI Age! Civilization unlocked!
+      </div>
     </section>
 
-    <!-- 地图 -->
+    <!-- Map -->
     <section class="panel grid-panel">
-      <h2>农场地图（5×5）</h2>
+      <h2>Village Map (5×5)</h2>
       <div id="grid-container" class="grid-container"></div>
     </section>
 
-    <!-- 提示信息 -->
+    <!-- Message log -->
     <section class="panel message-panel">
-      <h2>提示信息</h2>
-      <p id="message-text" class="message">加载中…</p>
+      <h2>Messages</h2>
+      <p id="message-text" class="message">Loading…</p>
     </section>
 
-    <!-- 操作按钮 -->
+    <!-- Action buttons -->
     <section class="panel actions-panel">
-      <button id="reset-btn" class="btn-reset">🔄 重新开始</button>
+      <button id="next-turn-btn" class="btn btn-primary">▶ Next Turn</button>
+      <button id="reset-btn" class="btn btn-secondary">🔄 Reset Game</button>
     </section>
 
     <footer class="game-footer">
-      <p>双击 index.html 即可运行 · 用 AI 描述需求，而不是直接改代码</p>
+      <p>Open index.html to play · Describe your idea to AI before editing code</p>
     </footer>
   </div>
 
-  <!-- 按依赖顺序加载脚本 -->
+  <!-- Load scripts in dependency order -->
   <script src="data/config.js"></script>
+  <script src="data/buildings.js"></script>
   <script src="systems/resources.js"></script>
-  <script src="systems/growth.js"></script>
-  <script src="systems/quest.js"></script>
-  <script src="systems/player.js"></script>
+  <script src="systems/buildings.js"></script>
+  <script src="systems/production.js"></script>
   <script src="systems/grid.js"></script>
+  <script src="systems/quest.js"></script>
   <script src="systems/ui.js"></script>
   <script src="main.js"></script>
 </body>

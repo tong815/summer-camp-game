@@ -1,6 +1,6 @@
 /**
- * 【界面系统】负责同学：界面组
- * 负责页面提示、资源显示、按钮显示
+ * UI system — UI / Text / Art Team.
+ * Renders resource bar, build menu, messages, and buttons.
  */
 
 window.CampGame = window.CampGame || {};
@@ -10,50 +10,146 @@ CampGame.ui = {
 
   init: function () {
     this.elements = {
-      gold: document.getElementById("gold-count"),
-      water: document.getElementById("water-count"),
-      harvest: document.getElementById("harvest-count"),
-      quest: document.getElementById("quest-text"),
-      message: document.getElementById("message-text"),
-      resetBtn: document.getElementById("reset-btn"),
-      grid: document.getElementById("grid-container"),
+      resourceBar: document.getElementById("resource-bar"),
+      buildMenu: document.getElementById("build-menu"),
+      selectedBuilding: document.getElementById("selected-building"),
+      questText: document.getElementById("quest-text"),
+      messageText: document.getElementById("message-text"),
       winBanner: document.getElementById("win-banner"),
+      gridContainer: document.getElementById("grid-container"),
+      nextTurnBtn: document.getElementById("next-turn-btn"),
+      resetBtn: document.getElementById("reset-btn"),
     };
 
     var self = this;
+
+    this.elements.nextTurnBtn.addEventListener("click", function () {
+      CampGame.nextTurn();
+    });
+
     this.elements.resetBtn.addEventListener("click", function () {
       CampGame.reset();
     });
+
+    this.renderBuildMenu();
   },
 
-  /** 更新资源栏和任务栏 */
-  updateStats: function () {
-    var res = CampGame.resources.getState();
-    var quest = CampGame.quest;
+  renderResourceBar: function () {
+    var keys = CampGame.config.resourceKeys;
+    var display = CampGame.config.resourceDisplay;
+    var state = CampGame.resources.getState();
+    var html = "";
+    var i;
+    var key;
+    var info;
 
-    this.elements.gold.textContent = res.gold;
-    this.elements.water.textContent = res.water;
-    this.elements.harvest.textContent = res.harvestCount;
-    this.elements.quest.textContent = quest.getDescription(res.harvestCount);
+    for (i = 0; i < keys.length; i++) {
+      key = keys[i];
+      info = display[key];
 
-    if (quest.isWon()) {
+      html += '<div class="stat-item">';
+      html += info.icon + " " + info.label + ": ";
+      html += '<span id="res-' + key + '">' + state[key] + "</span>";
+      html += "</div>";
+    }
+
+    this.elements.resourceBar.innerHTML = html;
+  },
+
+  renderBuildMenu: function () {
+    var buildings = CampGame.buildings.getBuildMenuList();
+    var html = "";
+    var i;
+    var def;
+    var costText;
+
+    for (i = 0; i < buildings.length; i++) {
+      def = buildings[i];
+      costText = CampGame.buildings.formatCost(def.cost);
+
+      html += '<button class="build-btn" data-building-id="' + def.id + '">';
+      html += def.icon + " " + def.name;
+      html += '<span class="build-cost">(' + costText + ")</span>";
+      html += "</button>";
+    }
+
+    this.elements.buildMenu.innerHTML = html;
+
+    var buttons = this.elements.buildMenu.querySelectorAll(".build-btn");
+    var j;
+
+    for (j = 0; j < buttons.length; j++) {
+      buttons[j].addEventListener("click", function () {
+        var buildingId = this.getAttribute("data-building-id");
+        CampGame.onBuildingSelect(buildingId);
+      });
+    }
+  },
+
+  renderSelectedBuilding: function () {
+    var selected = CampGame.buildings.getSelected();
+    var el = this.elements.selectedBuilding;
+
+    if (!selected) {
+      el.innerHTML = "No building selected. Pick one from the menu above.";
+      return;
+    }
+
+    var costText = CampGame.buildings.formatCost(selected.cost);
+
+    el.innerHTML =
+      selected.icon + " <strong>" + selected.name + "</strong><br>" +
+      selected.description + "<br>" +
+      "Cost: " + costText + "<br>" +
+      "<em>Click an empty tile to build.</em>";
+  },
+
+  highlightSelectedBuildButton: function () {
+    var selectedId = CampGame.buildings.selectedId;
+    var buttons = this.elements.buildMenu.querySelectorAll(".build-btn");
+    var i;
+
+    for (i = 0; i < buttons.length; i++) {
+      var btn = buttons[i];
+      var btnId = btn.getAttribute("data-building-id");
+
+      if (btnId === selectedId) {
+        btn.classList.add("build-btn--active");
+      } else {
+        btn.classList.remove("build-btn--active");
+      }
+    }
+  },
+
+  updateQuest: function () {
+    this.elements.questText.textContent = CampGame.quest.getDescription();
+
+    if (CampGame.quest.isWon()) {
       this.elements.winBanner.classList.remove("hidden");
     } else {
       this.elements.winBanner.classList.add("hidden");
     }
   },
 
-  /** 显示操作提示 */
   showMessage: function (text, isSuccess) {
-    var el = this.elements.message;
+    var el = this.elements.messageText;
+    var styleClass = "message";
+
+    if (isSuccess) {
+      styleClass += " message--success";
+    } else {
+      styleClass += " message--error";
+    }
+
     el.textContent = text;
-    el.className = "message " + (isSuccess ? "message--success" : "message--error");
+    el.className = styleClass;
   },
 
-  /** 重新渲染地图并刷新界面 */
   refresh: function () {
-    this.elements.grid.innerHTML = "";
-    CampGame.grid.render(this.elements.grid);
-    this.updateStats();
+    this.renderResourceBar();
+    this.renderSelectedBuilding();
+    this.highlightSelectedBuildButton();
+    this.updateQuest();
+    CampGame.grid.render(this.elements.gridContainer);
   },
 };

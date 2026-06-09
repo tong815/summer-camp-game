@@ -1,135 +1,135 @@
-# 学生 AI 协作流程
+# Student AI Collaboration Workflow
 
-这份文档是写给你（7 年级同学）看的。  
-用 AI 做游戏时，**先描述需求，再改代码**。
+This guide is for **Grade 7 students** working on AI Civilization Village.
 
----
-
-## 第 1 步：我想做什么
-
-用 **一句话** 说出你的目标。
-
-**好的例子：**
-
-- 「我想让地图从 5×5 改成 6×6。」
-- 「我想增加一种新植物：仙人掌。」
-- 「我想收获一次给 5 个金币而不是 3 个。」
-
-**不好的例子：**
-
-- 「帮我改代码。」（太模糊，AI 不知道改什么）
-- 「让游戏更好玩。」（没有具体标准）
+**Rule: describe what you want before asking AI to edit code.**
 
 ---
 
-## 第 2 步：当前发生了什么
+## Step 1: What do I want to do?
 
-描述 **现在** 游戏里的实际情况。
+Write **one clear sentence**.
 
-**例子：**
+**Good examples:**
 
-- 「现在地图是 5 行 5 列，在 `data/config.js` 里写的。」
-- 「现在点击空地会消耗 1 点水，但我希望不消耗水。」
-- 「现在收获 3 个就胜利，我觉得太少了。」
+- "I want to add a Market building that produces gold."
+- "I want the win condition to be 15 knowledge instead of 10."
+- "I want the map to be 6×6."
 
-可以补充：你负责哪个文件、你点击后看到了什么。
+**Bad examples:**
 
----
-
-## 第 3 步：我希望它变成什么
-
-描述 **改完之后** 你希望看到的结果。尽量具体。
-
-**例子：**
-
-- 「改完后，地图显示 6 行 6 列，一共 36 个格子。」
-- 「改完后，点击空地直接种下去，不检查水量。」
-- 「改完后，任务要收获 5 个植物才算胜利。」
+- "Fix my code." (too vague)
+- "Make the game better." (no clear goal)
 
 ---
 
-## 第 4 步：把需求发给 AI
+## Step 2: What is happening now?
 
-把上面三步整理成一段话，发给 AI（Cursor、ChatGPT 等都可以）。
+Describe the **current** behavior.
 
-**模板：**
+**Examples:**
+
+- "Right now there are 6 buildings in the menu. I want a 7th."
+- "Right now Farm costs 2 wood. I want it to cost 3."
+- "When I click Next Turn, School gives 1 knowledge."
+
+Mention which file you work on.
+
+---
+
+## Step 3: What should happen after the change?
+
+Describe the **expected result** clearly.
+
+**Examples:**
+
+- "After the change, the Build Menu shows a Market button."
+- "After the change, building a Farm costs 3 wood."
+- "After the change, winning requires 15 knowledge."
+
+---
+
+## Step 4: Send your request to AI
+
+Use this template:
 
 ```
-我负责：[文件名，例如 systems/quest.js]
+My team: Building Team
+My file: data/buildings.js
 
-我想做什么：[一句话目标]
+What I want: Add a Market building.
 
-当前发生了什么：[现在的行为]
+Current behavior: There is no Market in the build menu.
 
-我希望它变成什么：[期望的结果]
+Expected result:
+- Market icon: 🏪
+- Cost: 2 wood, 2 stone
+- Produces: 2 gold per turn
+- Shows in the build menu
 
-请只修改我负责的文件（如果需要改别的文件，请告诉我理由）。
-改完后请简单说明改了哪里。
+Please only edit data/buildings.js and explain what you changed.
 ```
 
 ---
 
-## 第 5 步：复制代码
+## Step 5: Copy the code
 
-AI 会给你代码或修改说明：
+1. Open the file AI mentions
+2. Find the right place
+3. Paste or replace the code
+4. **Save** (Ctrl + S)
 
-1. 打开对应的文件
-2. 找到 AI 说的位置
-3. 粘贴或替换代码
-4. **保存文件**（Ctrl + S）
-
-如果不确定贴哪里，可以把 AI 的原话再问一遍：「请告诉我要替换第几行到第几行。」
+If unsure where to paste, ask AI: "Which lines should I replace?"
 
 ---
 
-## 第 6 步：测试
+## Step 6: Test
 
-1. 回到浏览器
-2. 按 **F5** 刷新页面（或重新双击 `index.html`）
-3. **亲手点一点**，看是不是你想要的效果
+1. Go to the browser
+2. Press **F5** to refresh (or reopen `index.html`)
+3. Play through the new feature yourself
 
-测试清单：
+Checklist:
 
-- [ ] 新功能能用吗？
-- [ ] 原来的功能有没有坏掉？
-- [ ] 页面上的数字、文字对不对？
-- [ ] 有没有弹出报错？
+- [ ] Does the new feature work?
+- [ ] Did anything else break?
+- [ ] Do numbers and text look correct?
+- [ ] Any red errors in the console (F12)?
 
 ---
 
-## 第 7 步：把错误截图或报错发给 AI
+## Step 7: Report errors to AI
 
-如果没成功，**不要慌**，这是正常的开发过程。
+If something fails, send:
 
-发给 AI 的信息可以包括：
+1. A **screenshot** of the page
+2. Any **error text** from the console (F12 → Console)
+3. **What you clicked** before the problem
 
-1. **截图** — 页面看起来什么样
-2. **报错** — 按 F12 打开开发者工具，看 Console（控制台）里的红字，复制给 AI
-3. **你的操作** — 「我先点了空地，再点了种子，然后……」
-
-**例子：**
+**Example:**
 
 ```
-我按你的代码改完后，点击空地没有反应。
-控制台报错：Uncaught TypeError: Cannot read properties of undefined
-我改的是 systems/grid.js 第 45 行附近。
-请帮我看看哪里错了。
+I added the Market building but it does not show in the menu.
+No error in console.
+I edited data/buildings.js and added "market" to buildMenuIds.
+Please help me find the mistake.
 ```
 
-然后回到 **第 4 步**，继续迭代，直到满意为止。
+Then go back to **Step 4** and try again.
 
 ---
 
-## 小组协作小贴士
+## Tips for this project
 
-- 每人 mainly 改 **自己负责的文件**，改之前跟组长说一声
-- 改 **config.js** 或 **main.js** 前先讨论，因为会影响全局
-- 每天结束前玩一遍完整流程，确保还能胜利
-- 好的需求描述 = 省时间 + 少踩坑
+- **Most new buildings** → edit `data/buildings.js` only
+- **Starting resources or win goal** → edit `data/config.js`
+- **How the page looks** → UI team edits `style.css` and `systems/ui.js`
+- Tell your team before editing `main.js`
 
 ---
 
-## 记住
+## Remember
 
-> **你是设计师和测试员，AI 是编程助手。**  
-> **你说清楚「要什么」，AI 帮你写「怎么做」。**
+> **You design and test. AI writes code.**
+
+> **Say what you want first. Code second.**

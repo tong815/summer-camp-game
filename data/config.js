@@ -1,43 +1,50 @@
 /**
- * 【配置系统】负责同学：全体可读，修改前请和小组讨论
- * 存放地图大小、初始资源、植物阶段等游戏配置
+ * Global settings — all teams can read this file.
+ * Change grid size, starting resources, and win condition here.
  */
 
 window.CampGame = window.CampGame || {};
 
 CampGame.config = {
-  // 地图大小（行 × 列）
+  // Grid size (rows x columns)
   gridRows: 5,
   gridCols: 5,
 
-  // 玩家初始资源
-  initialGold: 10,
-  initialWater: 5,
-  initialHarvestCount: 0,
+  // Default tile when nothing is built
+  emptyBuildingId: "empty",
 
-  // 格子类型
-  cellTypes: {
-    EMPTY: "empty",
-    SEED: "seed",
-    SEEDLING: "seedling",
-    MATURE: "mature",
+  // Starting resources
+  initialResources: {
+    food: 5,
+    wood: 8,
+    stone: 5,
+    knowledge: 0,
+    gold: 3,
   },
 
-  // 每种格子的显示文字和颜色
-  cellDisplay: {
-    empty: { label: "空地", emoji: "⬜", color: "#e8e8e8" },
-    seed: { label: "种子", emoji: "🌱", color: "#c8e6c9" },
-    seedling: { label: "幼苗", emoji: "🌿", color: "#a5d6a7" },
-    mature: { label: "成熟", emoji: "🌻", color: "#fff176" },
+  // Resource keys shown in the UI (order matters)
+  resourceKeys: [
+    "food",
+    "wood",
+    "stone",
+    "knowledge",
+    "gold",
+  ],
+
+  // Labels and icons for the resource bar
+  resourceDisplay: {
+    food: { label: "Food", icon: "🍎" },
+    wood: { label: "Wood", icon: "🪵" },
+    stone: { label: "Stone", icon: "🪨" },
+    knowledge: { label: "Knowledge", icon: "📚" },
+    gold: { label: "Gold", icon: "💰" },
   },
 
-  // 种植和浇水消耗
-  plantCost: { water: 1 },
-  waterCost: { water: 1 },
+  // Win condition: reach this much knowledge
+  questTarget: {
+    resource: "knowledge",
+    amount: 10,
+  },
 
-  // 收获奖励
-  harvestReward: { gold: 3 },
-
-  // 任务目标：收获多少个植物算胜利
-  questTarget: 3,
+  questDescription: "Reach 10 Knowledge to enter the AI Age.",
 };

@@ -1,178 +1,181 @@
-# 模块分工说明
+# Module Division
 
-本项目建议 **5–6 名同学** 分工负责不同子系统。  
-每人主要维护 1–2 个文件，改之前先跟小组对齐需求。
+This project works best with **5–6 students**, each owning one area.
 
----
-
-## 总览
-
-| 序号 | 负责方向 | 主要文件 | 做什么 |
-|------|----------|----------|--------|
-| 1 | 格子地图系统 | `systems/grid.js` | 创建 5×5 矩阵、画格子、响应点击 |
-| 2 | 资源系统 | `systems/resources.js` | 金币、水量、收获次数的增减 |
-| 3 | 成长系统 | `systems/growth.js` | 种植、浇水、成熟、收获的状态规则 |
-| 4 | 任务系统 | `systems/quest.js` | 任务目标、进度、是否胜利 |
-| 5 | 界面系统 | `systems/ui.js`、`style.css` | 资源栏、任务栏、提示、按钮、样式 |
-| 6 | 美术与文本 | `data/config.js`、页面文案 | emoji、颜色、初始数值、任务目标数 |
-
-另外：
-
-- **`systems/player.js`** — 把「点击格子」和各个系统连起来，可由组长或地图组兼管
-- **`main.js`** — 启动和重置游戏，建议 **组长** 维护，其他人改前先沟通
+Talk to your team before editing someone else's files.
 
 ---
 
-## 1. 格子地图系统（地图组）
+## Overview
 
-**文件：** `systems/grid.js`
+| # | Team                  | Main files                              | Responsibility                          |
+|---|-----------------------|-----------------------------------------|-----------------------------------------|
+| 1 | Grid & Map            | `systems/grid.js`                       | 5×5 map, tile states, rendering, clicks |
+| 2 | Building              | `data/buildings.js`, `systems/buildings.js` | Building defs, select & place buildings |
+| 3 | Resource              | `systems/resources.js`, `data/config.js` | Resource amounts, costs, starting values |
+| 4 | Production Rules      | `systems/production.js`                 | What happens each turn                  |
+| 5 | Quest & Progress      | `systems/quest.js`                      | Win condition, progress tracking        |
+| 6 | UI / Text / Art       | `systems/ui.js`, `style.css`, `index.html` | Layout, buttons, colors, messages   |
 
-**职责：**
-
-- 用二维数组表示地图
-- 在页面上画出 5×5 格子
-- 每个格子显示对应 emoji 和颜色（数据来自 `config.js`）
-- 玩家点击格子时，通知主程序
-
-**常见扩展需求：**
-
-- 地图改成 6×6、8×8
-- 格子加边框动画、点击音效（需协调界面组）
-- 显示格子坐标 (行, 列)
-
-**不要轻易改：** `growth.js` 里的规则（那是成长组的活）
+**Team lead** (optional): maintains `main.js` — coordinate before changing it.
 
 ---
 
-## 2. 资源系统（资源组）
+## 1. Grid & Map Team
 
-**文件：** `systems/resources.js`
+**Files:** `systems/grid.js`
 
-**职责：**
+**You own:**
 
-- 保存并更新：金币、水、收获次数
-- 判断资源够不够（例如水够不够种植）
-- 提供 `getState()` 给界面显示
+- Creating the 5×5 tile matrix
+- Storing each tile's building id (`empty`, `farm`, …)
+- Drawing the map on screen
+- Sending tile clicks to `CampGame.onTileClick`
 
-**常见扩展需求：**
+**Example tasks:**
 
-- 增加新资源：肥料、能量
-- 收获给更多金币
-- 每回合自动恢复 1 点水
+- Change map to 6×6 (also update `data/config.js`)
+- Show tile coordinates (row, col)
+- Highlight empty tiles when a building is selected
 
-**配置初始值：** 在 `data/config.js` 里改，和资源组同学一起定
-
----
-
-## 3. 成长系统（成长组）
-
-**文件：** `systems/growth.js`
-
-**职责：**
-
-- 定义：空地 → 种子 → 幼苗 → 成熟 的变化
-- 判断当前格子能不能浇水、能不能收获
-- 收获后格子变回什么状态
-
-**常见扩展需求：**
-
-- 多加一个阶段（例如「开花」）
-- 浇水 3 次才成熟
-- 不同植物不同成长路线
-
-**核心原则：** 这里只写 **规则**，不直接改页面显示（界面组的事）
+**Do not change:** building costs or production (Building / Production teams)
 
 ---
 
-## 4. 任务系统（任务组）
+## 2. Building Team
 
-**文件：** `systems/quest.js`
+**Files:** `data/buildings.js`, `systems/buildings.js`
 
-**职责：**
+**You own:**
 
-- 设定胜利条件（默认：收获 3 个植物）
-- 跟踪进度，判断是否胜利
-- 生成任务栏文字
+- What buildings exist (name, icon, color, description)
+- Build costs (`cost: { wood: 2 }`)
+- Production per turn (`produces: { food: 2 }`)
+- Build menu list (`CampGame.buildMenuIds`)
+- Logic for selecting and placing buildings
 
-**常见扩展需求：**
+**Example tasks:**
 
-- 多个任务：先收获 3 个，再赚 20 金币
-- 限时任务、连续任务
-- 胜利后显示不同评语
+- Add a new building (Market, Temple, Workshop)
+- Change Farm cost from 2 wood to 3 wood
+- Add a building that costs knowledge to build
 
-**注意：** 收获次数来自 `resources.js`，任务组只 **读取** 数字，不要重复计数
-
----
-
-## 5. 界面系统（界面组）
-
-**文件：** `systems/ui.js`、`style.css`、`index.html`（结构部分）
-
-**职责：**
-
-- 更新资源栏、任务栏的数字和文字
-- 显示操作提示（成功 / 失败）
-- 胜利横幅、「重新开始」按钮
-- 页面好不好看、布局是否合理
-
-**常见扩展需求：**
-
-- 换主题色、加背景图
-- 提示信息 3 秒后自动消失
-- 手机上也好看（响应式布局）
-
-**注意：** 界面组 **展示** 数据，数据的计算在 resources / quest 里
+**This is the main file for content additions.** Most student ideas start here.
 
 ---
 
-## 6. 美术与文本系统（美术组）
+## 3. Resource Team
 
-**文件：** `data/config.js`，以及各处的提示语字符串
+**Files:** `systems/resources.js`, `data/config.js` (resource section)
 
-**职责：**
+**You own:**
 
-- 格子 emoji 和颜色（`cellDisplay`）
-- 初始金币、水量、任务目标（`initialGold`、`questTarget` 等）
-- 种植 / 浇水 / 收获消耗与奖励
-- 与界面组一起润色玩家看到的文案
+- Starting resources (food, wood, stone, knowledge, gold)
+- Adding and spending resources
+- Checking if player can afford something
 
-**常见扩展需求：**
+**Example tasks:**
 
-- 把 🌻 换成 🍅，做「番茄农场」
-- 调难度：初始 10 水改成 8 水
-- 新增 `cellTypes` 类型（需同步改 growth、grid）
+- Start with more wood
+- Add a new resource type (energy)
+- Show resource icons in the bar (with UI team)
 
 ---
 
-## 协作边界（避免踩脚）
+## 4. Production Rule Team
+
+**Files:** `systems/production.js`
+
+**You own:**
+
+- What happens when player clicks **Next Turn**
+- Reading each building's `produces` field and applying it
+
+**Important:** Do **not** hard-code "farm gives food" here. Read from `data/buildings.js`.
+
+**Example tasks:**
+
+- Show a detailed production log
+- Skip production for empty tiles (already handled)
+- Add a rule: "Lab only produces if you also have a School on the map" (advanced)
+
+---
+
+## 5. Quest & Progress Team
+
+**Files:** `systems/quest.js`, `data/config.js` (quest section)
+
+**You own:**
+
+- Win condition (default: 10 knowledge)
+- Progress text ("3 / 10 knowledge")
+- Detecting when player wins
+
+**Example tasks:**
+
+- Win by building 3 schools instead
+- Add a second goal (reach 20 gold AND 10 knowledge)
+- Change victory message
+
+---
+
+## 6. UI / Text / Art Team
+
+**Files:** `systems/ui.js`, `style.css`, `index.html`
+
+**You own:**
+
+- Page layout and colors
+- Resource bar, build menu, message area
+- Next Turn and Reset buttons
+- Win banner and subtitles
+
+**Example tasks:**
+
+- Dark mode theme
+- Bigger grid cells on mobile
+- Tooltips on build buttons
+
+**Note:** UI **displays** data; it does not calculate resources (Resource team does that).
+
+---
+
+## How systems connect
 
 ```
-玩家点击格子
-    ↓
-grid.js 收到点击
-    ↓
-main.js → player.js 决定做什么
-    ↓
-growth.js（规则） + resources.js（扣/add 资源） + quest.js（检查胜利）
-    ↓
-ui.js 刷新画面
+Player picks building (UI → buildings.js)
+        ↓
+Player clicks tile (grid.js → main.js → buildings.js)
+        ↓
+Resources spent (resources.js), tile updated (grid.js)
+        ↓
+Player clicks Next Turn (main.js → production.js)
+        ↓
+Resources added (resources.js), quest checked (quest.js)
+        ↓
+UI refreshes (ui.js)
 ```
-
-| 想改的内容 | 找谁 |
-|------------|------|
-| 格子长什么样 | 美术组 + 界面组 |
-| 点格子后状态怎么变 | 成长组 |
-| 金币水怎么变 | 资源组 |
-| 什么时候算赢 | 任务组 |
-| 按钮、布局、颜色 | 界面组 |
-| 整个游戏重启逻辑 | 组长（main.js） |
 
 ---
 
-## 第一次开会可以定的 3 件事
+## Who to ask for what
 
-1. 每人认领上表中的一个模块  
-2. 约定：改别人文件前在群里说一声  
-3. 定一个小组共同目标（例：「我们要加一种会枯死的植物」），拆成各模块的小需求  
+| I want to…                    | Ask team…        |
+|-------------------------------|------------------|
+| Add a new building type       | Building         |
+| Change starting gold          | Resource         |
+| Change what happens each turn | Production Rules |
+| Change win condition          | Quest & Progress |
+| Make the page look better     | UI / Art         |
+| Make the map bigger           | Grid & Map + Resource (config) |
 
-祝协作顺利 🌱
+---
+
+## First team meeting checklist
+
+1. Each person picks one team from the table
+2. Agree: message the group before editing another team's file
+3. Pick one group goal (example: "Add a Market and a new win condition")
+4. Split that goal into small tasks — one per team
+
+Good luck building your civilization 🏛️

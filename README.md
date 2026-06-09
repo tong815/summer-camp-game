@@ -1,106 +1,171 @@
-# AI 夏令营 · 迷你农场
+# AI Civilization Village
 
-面向 **7 年级学生** 的 AI 协作网页游戏基础项目。
+A browser-based civilization village game for **Grade 7 AI summer camp** students.
 
-学生学习的重点不是背代码语法，而是：
+Students learn how to work with AI:
 
-> **描述需求 → 拆分系统 → 让 AI 实现 → 测试 → 修改**
+> **Describe needs → Split systems → Let AI implement → Test → Improve**
 
-## 这是什么？
+The core idea:
 
-这是一个可以在浏览器里直接玩的 **5×5 格子农场** 小游戏：
+> **Game = Interactive Matrix + State Transition Rules**
 
-- 每个格子是一种「状态」（空地、种子、幼苗、成熟植物）
-- 点击格子会触发「规则」（种植、浇水、收获）
-- 页面会显示你的金币、水量、任务进度
+---
 
-游戏本质 = **可交互矩阵可视化 + 状态变化规则**。  
-详细思想见 [docs/project-idea.md](docs/project-idea.md)。
+## What is this?
 
-## 如何运行
+You build a small village on a **5×5 grid**. Each tile holds a **state** (empty, farm, school, lab, …).
 
-1. 下载或克隆本项目到本地
-2. **双击 `index.html`** 即可在浏览器中打开
-3. 不需要安装 Node.js、不需要启动服务器
+Each turn, buildings **produce resources** according to simple rules in `data/buildings.js`.
 
-> 如果浏览器有安全限制，也可以右键 `index.html` →「打开方式」→ 选择 Chrome / Edge。
+Your goal: grow **Knowledge** to 10 and reach the **AI Age**.
 
-## 游戏规则
+---
 
-| 操作 | 条件 | 效果 |
-|------|------|------|
-| 点击 **空地** | 至少有 1 点水 | 消耗 1 水，种下一颗种子 |
-| 点击 **种子** | 至少有 1 点水 | 消耗 1 水，长成幼苗 |
-| 点击 **幼苗** | 至少有 1 点水 | 消耗 1 水，长成成熟植物 |
-| 点击 **成熟植物** | 无消耗 | 收获，获得 3 金币，格子变回空地 |
+## How to run
 
-**初始资源：** 10 金币、5 点水、0 次收获
+1. Download or clone this project
+2. **Double-click `index.html`** to open it in your browser
+3. No npm, no server, no install needed
 
-**胜利条件：** 累计收获 **3 个** 成熟植物
+---
 
-点击「重新开始」可以重置整局游戏。
+## Basic game loop
 
-## 项目结构
+1. **Select a building** from the Build Menu (Farm, School, AI Lab, …)
+2. **Click an empty tile** on the 5×5 map to build
+3. The game checks if you have enough resources; if yes, it spends them and places the building
+4. Click **Next Turn** — every building produces resources
+5. Watch your resources and task progress
+6. Win when you reach **10 Knowledge**
+7. Click **Reset Game** to start over
+
+---
+
+## Starting resources
+
+| Resource   | Amount |
+|------------|--------|
+| Food       | 5      |
+| Wood       | 8      |
+| Stone      | 5      |
+| Knowledge  | 0      |
+| Gold       | 3      |
+
+---
+
+## Buildings (default)
+
+| Building | Cost           | Produces per turn   |
+|----------|----------------|---------------------|
+| Farm     | 2 wood         | +2 food             |
+| House    | 2 wood, 1 stone| +1 gold             |
+| School   | 3 wood, 1 stone| +1 knowledge        |
+| Mine     | 2 wood         | +2 stone            |
+| Forest   | 1 food         | +2 wood             |
+| AI Lab   | 3 stone, 2 gold| +2 knowledge        |
+
+---
+
+## Project structure
 
 ```
 summer-camp-game/
-├── index.html          # 页面入口
-├── style.css           # 样式
-├── main.js             # 启动游戏、连接各系统
+├── index.html
+├── style.css
+├── main.js                 # Start game, connect systems
 ├── data/
-│   └── config.js       # 配置（地图大小、资源、植物阶段）
+│   ├── config.js           # Grid size, starting resources, win goal
+│   └── buildings.js        # Building definitions (ADD NEW BUILDINGS HERE)
 ├── systems/
-│   ├── grid.js         # 格子地图
-│   ├── player.js       # 玩家操作逻辑
-│   ├── resources.js    # 金币、水、收获
-│   ├── growth.js       # 植物成长规则
-│   ├── quest.js        # 任务与胜利
-│   └── ui.js           # 界面显示
-└── docs/               # 给老师和学生的说明文档
+│   ├── grid.js             # Map and tile clicks
+│   ├── resources.js        # Food, wood, stone, knowledge, gold
+│   ├── buildings.js        # Select and place buildings
+│   ├── production.js       # Run production each turn
+│   ├── quest.js            # Win condition
+│   └── ui.js               # Page display
+└── docs/
+    ├── project-idea.md
+    ├── student-workflow.md
+    └── module-division.md
 ```
 
-## 学生如何分工
+---
 
-建议 5–6 人一组，每人负责一个子系统。详见 [docs/module-division.md](docs/module-division.md)。
+## How to add a new building (student-friendly)
 
-| 负责模块 | 主要文件 |
-|----------|----------|
-| 格子地图 | `systems/grid.js` |
-| 资源系统 | `systems/resources.js` |
-| 成长系统 | `systems/growth.js` |
-| 任务系统 | `systems/quest.js` |
-| 界面系统 | `systems/ui.js` + `style.css` |
-| 美术与文本 | `data/config.js`（emoji、颜色、提示语） |
+Most new content goes in **`data/buildings.js`**. You usually do **not** need to change `production.js`.
 
-## 如何使用 AI 协作开发
+**Example — add a Market:**
 
-**重要：每次修改前，先描述需求，不要直接说「帮我改代码」。**
+1. Open `data/buildings.js`
+2. Add a new entry:
 
-推荐流程见 [docs/student-workflow.md](docs/student-workflow.md)，简要版：
-
-1. **我想做什么** — 用一句话说目标（例：「我想让地图变成 6×6」）
-2. **当前发生了什么** — 描述现在的行为
-3. **我希望它变成什么** — 描述期望的结果
-4. **把需求发给 AI** — 告诉 AI 你负责哪个文件
-5. **复制代码** — 把 AI 给的代码贴进对应文件
-6. **测试** — 刷新浏览器，实际操作一遍
-7. **反馈错误** — 截图或复制报错发给 AI，继续迭代
-
-### 给 AI 的示例提示
-
-```
-我负责 systems/growth.js。
-现在：种子浇水 1 次就变成熟植物。
-我希望：种子 → 幼苗 → 成熟，需要浇水 2 次。
-请只修改 growth.js，并告诉我改了哪里。
+```javascript
+market: {
+  id: "market",
+  name: "Market",
+  icon: "🏪",
+  color: "#fff9c4",
+  description: "Trades food for gold.",
+  cost: {
+    wood: 2,
+    stone: 2,
+  },
+  produces: {
+    gold: 2,
+  },
+  buildable: true,
+},
 ```
 
-## 技术说明
+3. Add `"market"` to the `CampGame.buildMenuIds` list at the bottom of the same file
+4. Save, refresh the browser, and test
 
-- 纯 HTML + CSS + JavaScript
-- 无 React / Vue / 后端 / 数据库
-- 所有脚本通过 `<script>` 标签按顺序加载，使用全局 `CampGame` 对象连接各模块
+Tell AI: *"I want to add a Market building that costs 2 wood and 2 stone and produces 2 gold. Please edit data/buildings.js only."*
 
-## 许可证
+---
 
-供 AI 夏令营教学使用，可自由修改和扩展。
+## Student teams
+
+See [docs/module-division.md](docs/module-division.md) for who owns which file.
+
+| Team              | Main files                          |
+|-------------------|-------------------------------------|
+| Grid & Map        | `systems/grid.js`                   |
+| Building          | `data/buildings.js`, `systems/buildings.js` |
+| Resource          | `systems/resources.js`, `data/config.js` |
+| Production Rules  | `systems/production.js`             |
+| Quest & Progress  | `systems/quest.js`                  |
+| UI / Text / Art   | `systems/ui.js`, `style.css`        |
+
+---
+
+## Working with AI
+
+**Always describe what you want before asking AI to edit code.**
+
+See [docs/student-workflow.md](docs/student-workflow.md) for the full 7-step workflow.
+
+**Good prompt example:**
+
+```
+I work on data/buildings.js.
+I want to add a Windmill that costs 3 wood and produces 1 food and 1 gold.
+Please only edit buildings.js and tell me what you changed.
+```
+
+---
+
+## Tech notes
+
+- Plain HTML + CSS + JavaScript only
+- Opens directly from `index.html`
+- All modules connect through the global `CampGame` object
+- Code is formatted with clear indentation for beginners
+
+---
+
+## License
+
+Free to use and modify for AI summer camp teaching.

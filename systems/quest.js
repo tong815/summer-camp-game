@@ -1,16 +1,14 @@
 /**
- * 【任务系统】负责同学：任务组
- * 负责任务进度和胜利判断
+ * Quest system — Quest & Progress Team.
+ * Tracks progress toward the win condition.
  */
 
 window.CampGame = window.CampGame || {};
 
 CampGame.quest = {
-  target: 0,
   completed: false,
 
   init: function () {
-    this.target = CampGame.config.questTarget;
     this.completed = false;
   },
 
@@ -18,22 +16,42 @@ CampGame.quest = {
     this.init();
   },
 
-  /** 每次收获后检查是否达成目标 */
-  checkProgress: function (harvestCount) {
-    if (this.completed) return true;
-    if (harvestCount >= this.target) {
+  getTargetResource: function () {
+    return CampGame.config.questTarget.resource;
+  },
+
+  getTargetAmount: function () {
+    return CampGame.config.questTarget.amount;
+  },
+
+  getCurrentProgress: function () {
+    var resourceKey = this.getTargetResource();
+    return CampGame.resources.get(resourceKey);
+  },
+
+  checkProgress: function () {
+    if (this.completed) {
+      return true;
+    }
+
+    if (this.getCurrentProgress() >= this.getTargetAmount()) {
       this.completed = true;
       return true;
     }
-    return false;
-  },
 
-  /** 获取任务描述文字 */
-  getDescription: function (harvestCount) {
-    return "任务：收获 " + this.target + " 个植物（当前 " + harvestCount + " / " + this.target + "）";
+    return false;
   },
 
   isWon: function () {
     return this.completed;
+  },
+
+  getDescription: function () {
+    var current = this.getCurrentProgress();
+    var target = this.getTargetAmount();
+    var resource = this.getTargetResource();
+
+    return CampGame.config.questDescription +
+      " (" + current + " / " + target + " " + resource + ")";
   },
 };

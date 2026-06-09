@@ -1,42 +1,94 @@
 /**
- * 【主程序】负责同学：组长或全体协作
- * 启动游戏，连接各子系统
+ * Main program — team lead or whole group.
+ * Starts the game and connects all systems.
  */
 
 window.CampGame = window.CampGame || {};
 
-/** 格子被点击时的统一入口 */
-CampGame.onCellClick = function (row, col) {
-  if (CampGame.quest.isWon()) {
-    CampGame.ui.showMessage("你已经完成任务啦！可以点击「重新开始」再玩一局。", true);
+/** Player selects a building from the menu */
+CampGame.onBuildingSelect = function (buildingId) {
+  var ok = CampGame.buildings.select(buildingId);
+
+  if (!ok) {
+    CampGame.ui.showMessage("That building cannot be selected.", false);
     return;
   }
 
-  var result = CampGame.player.handleCellClick(row, col);
+  var selected = CampGame.buildings.getSelected();
+  CampGame.ui.showMessage("Selected: " + selected.name, true);
+  CampGame.ui.refresh();
+};
+
+/** Player clicks a tile on the map */
+CampGame.onTileClick = function (row, col) {
+  if (CampGame.quest.isWon()) {
+    CampGame.ui.showMessage(
+      "You already won! Click Reset Game to play again.",
+      true
+    );
+    return;
+  }
+
+  var result = CampGame.buildings.buildOnTile(row, col);
+
   CampGame.ui.showMessage(result.message, result.success);
   CampGame.ui.refresh();
 };
 
-/** 重置整局游戏 */
+/** Player clicks Next Turn */
+CampGame.nextTurn = function () {
+  if (CampGame.quest.isWon()) {
+    CampGame.ui.showMessage(
+      "You already won! Click Reset Game to play again.",
+      true
+    );
+    return;
+  }
+
+  var summary = CampGame.production.runTurn();
+  CampGame.quest.checkProgress();
+
+  if (CampGame.quest.isWon()) {
+    CampGame.ui.showMessage(
+      summary + " 🎉 You reached the AI Age! You win!",
+      true
+    );
+  } else {
+    CampGame.ui.showMessage(summary, true);
+  }
+
+  CampGame.ui.refresh();
+};
+
+/** Reset the whole game */
 CampGame.reset = function () {
   CampGame.resources.reset();
   CampGame.grid.reset();
+  CampGame.buildings.reset();
   CampGame.quest.reset();
-  CampGame.ui.showMessage("游戏已重置，开始新的种植吧！", true);
+
+  CampGame.ui.showMessage(
+    "Game reset. Select a building, place it on the map, then click Next Turn.",
+    true
+  );
   CampGame.ui.refresh();
 };
 
-/** 启动游戏 */
+/** Start the game */
 CampGame.start = function () {
   CampGame.resources.init();
   CampGame.grid.init();
+  CampGame.buildings.init();
   CampGame.quest.init();
   CampGame.ui.init();
-  CampGame.ui.showMessage("欢迎来到 AI 夏令营农场！点击空地种植，给种子浇水，收获成熟植物。", true);
+
+  CampGame.ui.showMessage(
+    "Welcome to AI Civilization Village! Select a building, click an empty tile, then press Next Turn.",
+    true
+  );
   CampGame.ui.refresh();
 };
 
-// 页面加载完成后启动
 document.addEventListener("DOMContentLoaded", function () {
   CampGame.start();
 });
