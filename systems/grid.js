@@ -1,6 +1,8 @@
 /**
  * Grid system — Grid & Map Team.
- * Stores tile states, renders the map, and handles tile clicks.
+ * Stores tile states, renders the map, and forwards tile clicks to main.js.
+ *
+ * Tile API: getTile / setTile (getCell / setCell are the same, for compatibility).
  */
 
 window.CampGame = window.CampGame || {};
@@ -38,6 +40,16 @@ CampGame.grid = {
 
   setTile: function (row, col, buildingId) {
     this.tiles[row][col] = buildingId;
+  },
+
+  /** Same as getTile — older name kept for compatibility */
+  getCell: function (row, col) {
+    return this.getTile(row, col);
+  },
+
+  /** Same as setTile — older name kept for compatibility */
+  setCell: function (row, col, buildingId) {
+    this.setTile(row, col, buildingId);
   },
 
   isEmpty: function (row, col) {

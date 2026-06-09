@@ -1,6 +1,7 @@
 /**
  * Resource system — Resource Team.
- * Manages food, wood, stone, knowledge, and gold.
+ * Manages dynamic resources: food, wood, stone, knowledge, gold.
+ * Resource types come from data/config.js (resourceKeys).
  */
 
 window.CampGame = window.CampGame || {};
@@ -8,16 +9,34 @@ window.CampGame = window.CampGame || {};
 CampGame.resources = {
   state: {},
 
+  /** Load resource keys from config */
+  getKeys: function () {
+    return CampGame.config.resourceKeys.slice();
+  },
+
+  /** Make sure a resource key exists in state */
+  ensureKey: function (key) {
+    if (this.state[key] === undefined) {
+      this.state[key] = 0;
+    }
+  },
+
   init: function () {
     var initial = CampGame.config.initialResources;
-    var keys = CampGame.config.resourceKeys;
+    var keys = this.getKeys();
     var i;
+    var key;
 
     this.state = {};
 
     for (i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      this.state[key] = initial[key] || 0;
+      key = keys[i];
+
+      if (initial[key] !== undefined) {
+        this.state[key] = initial[key];
+      } else {
+        this.state[key] = 0;
+      }
     }
   },
 
@@ -26,7 +45,8 @@ CampGame.resources = {
   },
 
   get: function (key) {
-    return this.state[key] || 0;
+    this.ensureKey(key);
+    return this.state[key];
   },
 
   getState: function () {
@@ -56,6 +76,7 @@ CampGame.resources = {
 
     for (key in cost) {
       if (cost.hasOwnProperty(key)) {
+        this.ensureKey(key);
         this.state[key] -= cost[key];
       }
     }
@@ -68,9 +89,7 @@ CampGame.resources = {
 
     for (key in reward) {
       if (reward.hasOwnProperty(key)) {
-        if (this.state[key] === undefined) {
-          this.state[key] = 0;
-        }
+        this.ensureKey(key);
         this.state[key] += reward[key];
       }
     }

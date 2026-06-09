@@ -1,6 +1,7 @@
 /**
  * UI system — UI / Text / Art Team.
- * Renders resource bar, build menu, messages, and buttons.
+ * Renders resource bar, build menu, grid, task progress, and messages.
+ * Event wiring lives in main.js.
  */
 
 window.CampGame = window.CampGame || {};
@@ -20,22 +21,10 @@ CampGame.ui = {
       nextTurnBtn: document.getElementById("next-turn-btn"),
       resetBtn: document.getElementById("reset-btn"),
     };
-
-    var self = this;
-
-    this.elements.nextTurnBtn.addEventListener("click", function () {
-      CampGame.nextTurn();
-    });
-
-    this.elements.resetBtn.addEventListener("click", function () {
-      CampGame.reset();
-    });
-
-    this.renderBuildMenu();
   },
 
   renderResourceBar: function () {
-    var keys = CampGame.config.resourceKeys;
+    var keys = CampGame.resources.getKeys();
     var display = CampGame.config.resourceDisplay;
     var state = CampGame.resources.getState();
     var html = "";
@@ -74,16 +63,6 @@ CampGame.ui = {
     }
 
     this.elements.buildMenu.innerHTML = html;
-
-    var buttons = this.elements.buildMenu.querySelectorAll(".build-btn");
-    var j;
-
-    for (j = 0; j < buttons.length; j++) {
-      buttons[j].addEventListener("click", function () {
-        var buildingId = this.getAttribute("data-building-id");
-        CampGame.onBuildingSelect(buildingId);
-      });
-    }
   },
 
   renderSelectedBuilding: function () {
@@ -108,10 +87,12 @@ CampGame.ui = {
     var selectedId = CampGame.buildings.selectedId;
     var buttons = this.elements.buildMenu.querySelectorAll(".build-btn");
     var i;
+    var btn;
+    var btnId;
 
     for (i = 0; i < buttons.length; i++) {
-      var btn = buttons[i];
-      var btnId = btn.getAttribute("data-building-id");
+      btn = buttons[i];
+      btnId = btn.getAttribute("data-building-id");
 
       if (btnId === selectedId) {
         btn.classList.add("build-btn--active");
@@ -121,7 +102,7 @@ CampGame.ui = {
     }
   },
 
-  updateQuest: function () {
+  renderTaskProgress: function () {
     this.elements.questText.textContent = CampGame.quest.getDescription();
 
     if (CampGame.quest.isWon()) {
@@ -129,6 +110,10 @@ CampGame.ui = {
     } else {
       this.elements.winBanner.classList.add("hidden");
     }
+  },
+
+  renderGrid: function () {
+    CampGame.grid.render(this.elements.gridContainer);
   },
 
   showMessage: function (text, isSuccess) {
@@ -147,9 +132,10 @@ CampGame.ui = {
 
   refresh: function () {
     this.renderResourceBar();
+    this.renderBuildMenu();
     this.renderSelectedBuilding();
     this.highlightSelectedBuildButton();
-    this.updateQuest();
-    CampGame.grid.render(this.elements.gridContainer);
+    this.renderTaskProgress();
+    this.renderGrid();
   },
 };

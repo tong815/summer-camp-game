@@ -1,9 +1,41 @@
 /**
  * Main program — team lead or whole group.
- * Starts the game and connects all systems.
+ * Initializes all systems and connects UI events.
+ *
+ * Game flow (AI Civilization Village):
+ *   1. Select building from menu
+ *   2. Click empty tile to build
+ *   3. Click Next Turn to run production
+ *   4. Quest checks win condition
  */
 
 window.CampGame = window.CampGame || {};
+
+/** Wire buttons and build menu clicks */
+CampGame.wireEvents = function () {
+  var ui = CampGame.ui;
+
+  ui.elements.nextTurnBtn.addEventListener("click", function () {
+    CampGame.nextTurn();
+  });
+
+  ui.elements.resetBtn.addEventListener("click", function () {
+    CampGame.reset();
+  });
+
+  ui.elements.buildMenu.addEventListener("click", function (event) {
+    var target = event.target;
+
+    while (target && target !== ui.elements.buildMenu) {
+      if (target.classList && target.classList.contains("build-btn")) {
+        var buildingId = target.getAttribute("data-building-id");
+        CampGame.onBuildingSelect(buildingId);
+        return;
+      }
+      target = target.parentNode;
+    }
+  });
+};
 
 /** Player selects a building from the menu */
 CampGame.onBuildingSelect = function (buildingId) {
@@ -15,6 +47,7 @@ CampGame.onBuildingSelect = function (buildingId) {
   }
 
   var selected = CampGame.buildings.getSelected();
+
   CampGame.ui.showMessage("Selected: " + selected.name, true);
   CampGame.ui.refresh();
 };
@@ -35,7 +68,7 @@ CampGame.onTileClick = function (row, col) {
   CampGame.ui.refresh();
 };
 
-/** Player clicks Next Turn */
+/** Player clicks Next Turn — run production for all buildings */
 CampGame.nextTurn = function () {
   if (CampGame.quest.isWon()) {
     CampGame.ui.showMessage(
@@ -46,6 +79,7 @@ CampGame.nextTurn = function () {
   }
 
   var summary = CampGame.production.runTurn();
+
   CampGame.quest.checkProgress();
 
   if (CampGame.quest.isWon()) {
@@ -74,13 +108,19 @@ CampGame.reset = function () {
   CampGame.ui.refresh();
 };
 
-/** Start the game */
-CampGame.start = function () {
+/** Initialize every subsystem in order */
+CampGame.init = function () {
   CampGame.resources.init();
   CampGame.grid.init();
   CampGame.buildings.init();
   CampGame.quest.init();
   CampGame.ui.init();
+  CampGame.wireEvents();
+};
+
+/** Start the game */
+CampGame.start = function () {
+  CampGame.init();
 
   CampGame.ui.showMessage(
     "Welcome to AI Civilization Village! Select a building, click an empty tile, then press Next Turn.",

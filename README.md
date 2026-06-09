@@ -164,6 +164,23 @@ Please only edit buildings.js and tell me what you changed.
 - All modules connect through the global `CampGame` object
 - Code is formatted with clear indentation for beginners
 
+### Architecture (AI Civilization Village)
+
+| File | Role |
+|------|------|
+| `main.js` | Initialize systems, wire buttons, handle build / next turn |
+| `data/config.js` | Grid size, starting resources, win goal |
+| `data/buildings.js` | Building costs and production rules |
+| `systems/grid.js` | 5×5 tile map (`getTile` / `setTile`) |
+| `systems/resources.js` | food, wood, stone, knowledge, gold |
+| `systems/buildings.js` | Select and place buildings |
+| `systems/production.js` | Read `produces` from building defs each turn |
+| `systems/quest.js` | Track knowledge goal |
+| `systems/ui.js` | Render UI only (no game logic) |
+
+Old farming files (`growth.js`, `player.js`) have been removed. The game loop is:
+**select building → click tile → Next Turn → production → check quest**.
+
 ---
 
 ## License
