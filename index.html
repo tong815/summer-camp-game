@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 夏令营 · 迷你农场</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-wrapper">
+    <header class="game-header">
+      <h1>🌾 AI 夏令营 · 迷你农场</h1>
+      <p class="subtitle">可交互矩阵 + 状态变化规则</p>
+    </header>
+
+    <!-- 资源栏 -->
+    <section class="panel resources-panel">
+      <h2>资源栏</h2>
+      <div class="stats">
+        <div class="stat-item">💰 金币：<span id="gold-count">0</span></div>
+        <div class="stat-item">💧 水量：<span id="water-count">0</span></div>
+        <div class="stat-item">🧺 收获：<span id="harvest-count">0</span></div>
+      </div>
+    </section>
+
+    <!-- 任务栏 -->
+    <section class="panel quest-panel">
+      <h2>任务栏</h2>
+      <p id="quest-text">任务：收获 3 个植物</p>
+      <div id="win-banner" class="win-banner hidden">🎉 任务完成！你是优秀的小农夫！</div>
+    </section>
+
+    <!-- 地图 -->
+    <section class="panel grid-panel">
+      <h2>农场地图（5×5）</h2>
+      <div id="grid-container" class="grid-container"></div>
+    </section>
+
+    <!-- 提示信息 -->
+    <section class="panel message-panel">
+      <h2>提示信息</h2>
+      <p id="message-text" class="message">加载中…</p>
+    </section>
+
+    <!-- 操作按钮 -->
+    <section class="panel actions-panel">
+      <button id="reset-btn" class="btn-reset">🔄 重新开始</button>
+    </section>
+
+    <footer class="game-footer">
+      <p>双击 index.html 即可运行 · 用 AI 描述需求，而不是直接改代码</p>
+    </footer>
+  </div>
+
+  <!-- 按依赖顺序加载脚本 -->
+  <script src="data/config.js"></script>
+  <script src="systems/resources.js"></script>
+  <script src="systems/growth.js"></script>
+  <script src="systems/quest.js"></script>
+  <script src="systems/player.js"></script>
+  <script src="systems/grid.js"></script>
+  <script src="systems/ui.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
